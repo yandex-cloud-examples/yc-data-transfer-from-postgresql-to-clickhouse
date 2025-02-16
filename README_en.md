@@ -1,0 +1,3 @@
+# Uploading data from Yandex Managed Service for PostgreSQL to a Yandex Managed Service for ClickHouse® data mart through Yandex Data Transfer
+
+With [Data Transfer](https://yandex.cloud/docs/data-transfer), you can transfer data from a [Managed Service for PostgreSQL](https://yandex.cloud/docs/managed-postgresql) cluster to a [Managed Service for ClickHouse®](https://yandex.cloud/docs/managed-clickhouse) one. See [this tutorial](https://yandex.cloud/docs/data-transfer/tutorials/rdbms-to-clickhouse) to learn how to set up the solution with Terraform. This repository contains the configuration file you will need: [postgresql-to-clickhouse.tf](postgresql-to-clickhouse.tf).
