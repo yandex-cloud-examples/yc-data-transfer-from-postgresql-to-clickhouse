@@ -37,10 +37,10 @@ resource "yandex_vpc_subnet" "mch_subnet-b" {
   v4_cidr_blocks = ["10.127.0.0/18"]
 }
 
-resource "yandex_vpc_subnet" "mch_subnet-c" {
-  description    = "Subnet in ru-central1-c availability zone for ClickHouse"
-  name           = "mch_subnet-c"
-  zone           = "ru-central1-c"
+resource "yandex_vpc_subnet" "mch_subnet-d" {
+  description    = "Subnet in ru-central1-d availability zone for ClickHouse"
+  name           = "mch_subnet-d"
+  zone           = "ru-central1-d"
   network_id     = yandex_vpc_network.mch_network.id
   v4_cidr_blocks = ["10.128.0.0/18"]
 }
@@ -55,7 +55,7 @@ resource "yandex_vpc_subnet" "mpg_subnet-a" {
 
 resource "yandex_vpc_security_group" "mch_security_group" {
   network_id  = yandex_vpc_network.mch_network.id
-  name        = "Managed ClickHouse security group"
+  name        = "mch-security-group"
   description = "Security group for Managed Service for ClickHouse"
 
   ingress {
@@ -83,7 +83,7 @@ resource "yandex_vpc_security_group" "mch_security_group" {
 
 resource "yandex_vpc_security_group" "mpg_security_group" {
   network_id  = yandex_vpc_network.mpg_network.id
-  name        = "Managed PostgreSQL security group"
+  name        = "mpg-security-group"
   description = "Security group for Managed Service for PostgreSQL"
 
   ingress {
@@ -108,6 +108,10 @@ resource "yandex_mdb_clickhouse_cluster" "mch-cluster" {
   environment        = "PRODUCTION"
   network_id         = yandex_vpc_network.mch_network.id
   security_group_ids = [yandex_vpc_security_group.mch_security_group.id]
+
+  lifecycle {
+    ignore_changes = [database, user,]
+  }
 
   clickhouse {
     resources {
@@ -153,20 +157,23 @@ resource "yandex_mdb_clickhouse_cluster" "mch-cluster" {
 
   host {
     type      = "ZOOKEEPER"
-    zone      = "ru-central1-c"
-    subnet_id = yandex_vpc_subnet.mch_subnet-c.id
+    zone      = "ru-central1-d"
+    subnet_id = yandex_vpc_subnet.mch_subnet-d.id
   }
+}
 
-  database {
-    name = "db1"
-  }
+resource "yandex_mdb_clickhouse_database" "mch-database" {
+  cluster_id = yandex_mdb_clickhouse_cluster.mch-cluster.id
+  name       = "db1"
+}
 
-  user {
-    name     = "ch-user"
-    password = local.ch_password
-    permission {
-      database_name = "db1"
-    }
+resource "yandex_mdb_clickhouse_user" "mch-user" {
+  cluster_id = yandex_mdb_clickhouse_cluster.mch-cluster.id
+  name       = "ch-user"
+  password   = local.ch_password
+
+  permission {
+      database_name = yandex_mdb_clickhouse_database.mch-database.name
   }
 }
 
