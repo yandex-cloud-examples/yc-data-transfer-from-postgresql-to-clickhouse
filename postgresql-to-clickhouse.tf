@@ -55,7 +55,7 @@ resource "yandex_vpc_subnet" "mpg_subnet-a" {
 
 resource "yandex_vpc_security_group" "mch_security_group" {
   network_id  = yandex_vpc_network.mch_network.id
-  name        = "mch-security-group"
+  name        = "mch_security_group"
   description = "Security group for Managed Service for ClickHouse"
 
   ingress {
@@ -83,7 +83,7 @@ resource "yandex_vpc_security_group" "mch_security_group" {
 
 resource "yandex_vpc_security_group" "mpg_security_group" {
   network_id  = yandex_vpc_network.mpg_network.id
-  name        = "mpg-security-group"
+  name        = "mpg_security_group"
   description = "Security group for Managed Service for PostgreSQL"
 
   ingress {
